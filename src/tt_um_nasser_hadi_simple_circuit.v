@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module tt_um_nasser_hadi_smpl (
+module tt_um_nasser_hadi_simple_circuit (
     input wire clk,	//add clk for synchronous piplining
     input wire A, B, C,
     output reg x, y
