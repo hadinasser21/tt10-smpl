@@ -4,31 +4,46 @@
  */
 
 `default_nettype none
-
 module tt_um_nasser_hadi_simple_circuit (
-    input wire clk,	//add clk for synchronous piplining
-    input wire A, B, C,
-    output reg x, y
+    input  wire [7:0] ui_in,     // Dedicated inputs
+    output wire [7:0] uo_out,    // Dedicated outputs
+    input  wire [7:0] uio_in,    // IOs: Input path
+    output wire [7:0] uio_out,   // IOs: Output path
+    output wire [7:0] uio_oe,    // IOs: Enable path (0=input, 1=output)
+    input  wire       ena,       // Always 1 when design is powered
+    input  wire       clk,       // Clock input
+    input  wire       rst_n      // Active-low reset
 );
 
-    // Stage 1: Combinational logic
-    wire e_temp;
-    wire y_temp;
+  // Map input wires for clarity
+  wire A = ui_in[0];
+  wire B = ui_in[1];
+  wire C = ui_in[2];
 
-    assign e_temp = A & B;
-    assign y_temp = ~C;
+  // Internal wire
+  wire e;
+  wire x;
+  wire y;
 
-    // Registers for pipelining (Stage 1 -> Stage 2)
-    reg reg_e, reg_y; //use reg_e and reg_y to store results of first stage
+  // Logic implementation
+  and g1(e, A, B);
+  not g2(y, C);
+  or  g3(x, e, y);
 
-    always @(posedge clk) begin
-        // Stage 1: latch intermediate values
-        reg_e <= e_temp;
-        reg_y <= y_temp;
+  // Assign outputs
+  assign uo_out[0] = x;
+  assign uo_out[1] = y;
+  assign uo_out[2] = 1'b0;
+  assign uo_out[3] = 1'b0;
+  assign uo_out[4] = 1'b0;
+  assign uo_out[5] = 1'b0;
+  assign uo_out[6] = 1'b0;
+  assign uo_out[7] = 1'b0;
 
-        // Stage 2: compute final outputs
-        x <= reg_e | reg_y; //Output x is computed in the second stage
-        y <= reg_y;  // y = ~C, passed through 1-cycle delay //Output y is also registered to maintain timing consistency
-    end
+  assign uio_out = 8'b00000000;
+  assign uio_oe  = 8'b00000000;
+
+  // Prevent unused input warnings
+  wire _unused = &{ena, clk, rst_n, ui_in[7:3], uio_in};
 
 endmodule
