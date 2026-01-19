@@ -22,6 +22,12 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+
+  // ✅ Option B: TB-level aliases (so they appear in the waveform under tb)
+  wire A = ui_in[0];
+  wire B = ui_in[1];
+  wire C = ui_in[2];
+
 `ifdef GL_TEST
   wire VPWR = 1'b1;
   wire VGND = 1'b0;
